@@ -21,9 +21,6 @@ module ActsAsCached
       extend  ClassMethods
       include InstanceMethods
 
-      extend  Extensions::ClassMethods    if defined? Extensions::ClassMethods
-      include Extensions::InstanceMethods if defined? Extensions::InstanceMethods
-
       options.symbolize_keys!
 
       # convert the find_by shorthand
@@ -37,9 +34,11 @@ module ActsAsCached
     end
   end
 end
+
 ActiveRecord::Base.send :extend, ActsAsCached::Mixin
 Rails::Application.initializer("cache_fu") do
-  Object.send :include, ActsAsCached::Mixin
-  #ActsAsCached.config = YAML.load(ERB.new(IO.read(config_file)).result)
+  if File.exists?(config_file = Rails.root.join('config', 'memcached.yml'))
+    ActsAsCached.config = YAML.load(ERB.new(IO.read(config_file)).result)
+  end
   ActsAsCached.config = {}
 end
