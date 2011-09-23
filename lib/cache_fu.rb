@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/acts_as_cached/config'
 require File.dirname(__FILE__) + '/acts_as_cached/cache_methods'
 require File.dirname(__FILE__) + '/acts_as_cached/benchmarking'
 require File.dirname(__FILE__) + '/acts_as_cached/disabled'
-require File.dirname(__FILE__) + '/acts_as_cached/railtie' if defined?(Rails::Railtie)
+require File.dirname(__FILE__) + '/acts_as_cached/railtie' if defined?(Rails)
 
 module ActsAsCached
   @@config = {}
@@ -35,7 +35,6 @@ module ActsAsCached
   end
 end
 
-ActiveRecord::Base.send :extend, ActsAsCached::Mixin
 Rails::Application.initializer("cache_fu") do
   if File.exists?(config_file = Rails.root.join('config', 'memcached.yml'))
     ActsAsCached.config = YAML.load(ERB.new(IO.read(config_file)).result)

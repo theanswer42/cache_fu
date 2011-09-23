@@ -16,8 +16,8 @@ module ActsAsCached
     end
 
     def self.benchmark(event)
-      self.class.runtime += event.duration
-      return unless Rails.logger
+      self.runtime += event.duration
+      return unless Rails.logger && Rails.logger.debug?
 
       Rails.logger.debug("==> #{event.name} (#{'%.1fms' % event.duration})")
     end
