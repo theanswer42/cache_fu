@@ -4,7 +4,13 @@ require 'rails'
 module ActsAsCached
   class Railtie < Rails::Railtie
     initializer 'cache_fu:extends' do
-      ActiveSupport.on_load(:active_record) { extend ActsAsCached::Mixin }
+      ActiveSupport.on_load :active_record do
+        include ActsAsCached::Mixin
+      end
+
+      ActiveSupport.on_load :action_controller do
+        include ActsAsCached::MemcacheRuntime
+      end
     end
 
     rake_tasks do

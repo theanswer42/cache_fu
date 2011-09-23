@@ -2,23 +2,31 @@ require 'benchmark'
 
 module ActsAsCached
   module Benchmarking #:nodoc:
-    def self.cache_runtime
-      @@cache_runtime ||= 0.0
+    def self.runtime=(value)
+      Thread.current['memcache_runtime'] = value
     end
 
-    def self.cache_reset_runtime
-      @@cache_runtime = nil
+    def self.runtime
+      Thread.current['memcache_runtime'] ||= 0.0
     end
 
-    def self.cache_benchmark(event)
-      return yield unless Rails.logger
+    def self.reset_runtime
+      rt, self.runtime = runtime, 0
+      rt
+    end
 
-      @@cache_runtime ||= 0.0
-      @@cache_runtime += event.duration
+    def self.benchmark(event)
+      self.class.runtime += event.duration
+      return unless Rails.logger
 
-      Rails.logger.debug("==> #{event.name} (#{'%.1f' % event.duration})")
+      Rails.logger.debug("==> #{event.name} (#{'%.1fms' % event.duration})")
     end
   end
+end
+
+ActiveSupport::Notifications.subscribe /cache/ do |*args|
+  event =  ActiveSupport::Notifications::Event.new(*args)
+  ActsAsCached::Benchmarking.benchmark(event)
 end
 
 module ActsAsCached
@@ -28,8 +36,8 @@ module ActsAsCached
 
     def append_info_to_payload(payload)
       super
-      payload[:memcache_runtime] = ActsAsCached::Benchmarking.cache_runtime
-      ActsAsCached::Benchmarking.cache_reset_runtime
+      payload[:memcache_runtime] = ActsAsCached::Benchmarking.runtime
+      ActsAsCached::Benchmarking.reset_runtime
     end
 
     module ClassMethods
@@ -43,9 +51,3 @@ module ActsAsCached
 end
 
 
-ActiveSupport::Notifications.subscribe /cache/ do |*args|
-  event =  ActiveSupport::Notifications::Event.new(*args)
-  ActsAsCached::Benchmarking.cache_benchmark(event)
-end
-
-ActionController::Base.include ActsAsCached::MemcacheRuntime
