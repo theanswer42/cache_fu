@@ -1,15 +1,10 @@
 module ActsAsCached
   module ClassMethods
     @@nil_sentinel = :_nil
+    @@cache_config = nil
 
     def cache_config
-      config = ActsAsCached::Config.class_config[cache_name] ||= {}
-      if name == cache_name
-        config
-      else
-        # sti
-        ActsAsCached::Config.class_config[name] ||= config.dup
-      end
+      @@cache_config ||= ActsAsCached.config.dup
     end
 
     def cache_options
