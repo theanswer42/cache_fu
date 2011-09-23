@@ -19,7 +19,7 @@ module ActsAsCached
       self.runtime += event.duration
       return unless Rails.logger && Rails.logger.debug?
 
-      Rails.logger.debug("==> #{event.name} (#{'%.1fms' % event.duration})")
+      Rails.logger.debug("Cache #{event.name.sub('cache_','').sub('.active_support','')} ==> #{event.payload[:key]} (#{'%.1fms' % event.duration}) #{'HIT' if event.payload[:hit]}#{'MISS' if event.payload[:miss]}")
     end
   end
 end

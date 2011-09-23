@@ -1,4 +1,3 @@
-require File.dirname(__FILE__) + '/acts_as_cached/config'
 require File.dirname(__FILE__) + '/acts_as_cached/cache_methods'
 require File.dirname(__FILE__) + '/acts_as_cached/benchmarking'
 require File.dirname(__FILE__) + '/acts_as_cached/disabled'
@@ -9,11 +8,15 @@ module ActsAsCached
   mattr_reader :config
 
   def self.config=(options)
-    @@config = Config.setup options
+    @@config = options
   end
 
   def self.skip_cache_gets=(boolean)
     ActsAsCached.config[:skip_gets] = boolean
+  end
+
+  def self.valued_keys
+    [:version, :pages, :per_page, :finder, :cache_id, :find_by, :key_size]
   end
 
   module Mixin
@@ -29,8 +32,8 @@ module ActsAsCached
         options[:cache_id] = find_by
       end
 
-      cache_config.replace  options.reject { |key,| not Config.valued_keys.include? key }
-      cache_options.replace options.reject { |key,| Config.valued_keys.include? key }
+      cache_config.replace  options.reject { |key,| not ActsAsCached.valued_keys.include? key }
+      cache_options.replace options.reject { |key,| ActsAsCached.valued_keys.include? key }
     end
   end
 end
