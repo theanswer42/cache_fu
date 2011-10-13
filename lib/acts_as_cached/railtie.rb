@@ -12,9 +12,5 @@ module ActsAsCached
         include ActsAsCached::MemcacheRuntime
       end
     end
-
-    rake_tasks do
-      load 'tasks/memcached.rake'
-    end
   end
 end
