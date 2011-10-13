@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'cache_fu'
-  s.version = '0.1.5'
+  s.version = '0.2.0-pre0'
   s.authors = ["Surendra Singhi"]
   s.summary = 'Makes caching easy for ActiveRecord models'
   s.description = "This gem is kreetitech's fork (http://github.com/kreetitech/cache_fu)."
