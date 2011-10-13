@@ -3,7 +3,11 @@
 A rewrite of acts_as_cached.
 This version is only compatible with rails 3 and above.
 
-For fragment and page caching use Rails inbuilt MemCacheStore as it already provides all the functionality.
+This gem version uses Dalli.
+If you want a memcache compatible version then see the branch memcache_client or use version 0.1.5 of the gem.
+
+For fragment and page caching use Rails DalliStore as it already provides all the functionality.
+
 This gem is very useful for caching in models.
 
 == Changes from acts_as_cached 1
@@ -17,5 +21,4 @@ This gem is very useful for caching in models.
 - set_cache on an instance can take a ttl
     >> @story.set_cache(15.days)
 
-
-Chris Wanstrath [ chris[at]ozmm[dot]org ]
+Surendra Singhi [ ssinghi[at]kreeti[dot]com]
