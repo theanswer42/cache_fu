@@ -3,13 +3,7 @@ module ActsAsCached
     @@nil_sentinel = :_nil
 
     def cache_config
-      config = ActsAsCached::Config.class_config[cache_name] ||= {}
-      if name == cache_name
-        config
-      else
-        # sti
-        ActsAsCached::Config.class_config[name] ||= config.dup
-      end
+      @cache_config ||= {}
     end
 
     def cache_options
@@ -183,7 +177,7 @@ module ActsAsCached
     end
 
     def cache_name
-      @cache_name ||= respond_to?(:base_class) ? base_class.name : name
+      @cache_name ||= respond_to?(:model_name) ? model_name.cache_key : name
     end
 
     def cache_keys(*cache_ids)
@@ -223,7 +217,16 @@ module ActsAsCached
     end
 
     def cache_id(key = nil)
-      key.nil? ? self.cache_key : "#{self.cache_key}/#{key}"
+      cid = case
+            when new_record?
+              "new"
+            when timestamp = self[:updated_at]
+              timestamp = timestamp.utc.to_s(:number)
+              "#{id}-#{timestamp}"
+            else
+              id.to_s
+            end
+      key.nil? ? cid : "#{cid}/#{key}"
     end
 
     def caches(method, options = {})
