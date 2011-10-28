@@ -43,7 +43,7 @@ module ActsAsCached
       keys_map = Hash[*keys.zip(cache_ids).flatten]
 
       # Call get_multi and figure out which keys were missed based on what was a hit
-      hits = ActsAsCached.config[:disabled] ? {} : (Rails.cache.read_multi(*keys) || {})
+      hits = Rails.cache.read_multi(*keys) || {}
 
       # Misses can take the form of key => nil
       hits.delete_if { |key, value| value.nil? }
