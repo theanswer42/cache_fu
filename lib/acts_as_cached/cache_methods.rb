@@ -78,10 +78,9 @@ module ActsAsCached
     end
 
     def set_cache(cache_id, value, options = nil)
-      value.tap do |v|
-        v = @@nil_sentinel if v.nil?
-        Rails.cache.write(cache_key(cache_id), v, options)
-      end
+      v = value.nil? ? @@nil_sentinel : value
+      Rails.cache.write(cache_key(cache_id), v, options)
+      value
     end
 
     def expire_cache(cache_id = nil)
@@ -143,13 +142,11 @@ module ActsAsCached
     alias :cached :caches
 
     def cached?(cache_id = nil)
-      return false if ActsAsCached.config[:skip_gets]
       Rails.cache.exist?(cache_key(cache_id))
     end
     alias :is_cached? :cached?
 
     def fetch_cache(cache_id)
-      return if ActsAsCached.config[:skip_gets]
       Rails.cache.read(cache_key(cache_id))
     end
 

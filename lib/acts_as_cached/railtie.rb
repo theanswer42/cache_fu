@@ -8,6 +8,12 @@ module ActsAsCached
         extend ActsAsCached::Mixin
       end
 
+      if File.exists?(config_file = Rails.root.join('config', 'memcached.yml'))
+        ActsAsCached.config = YAML.load(ERB.new(IO.read(config_file)).result)
+      else
+        ActsAsCached.config = {}
+      end
+
       ActiveSupport.on_load :action_controller do
         include ActsAsCached::MemcacheRuntime
       end

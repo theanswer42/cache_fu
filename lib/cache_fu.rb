@@ -36,10 +36,3 @@ module ActsAsCached
     end
   end
 end
-
-Rails::Application.initializer("cache_fu") do
-  if File.exists?(config_file = Rails.root.join('config', 'memcached.yml'))
-    ActsAsCached.config = YAML.load(ERB.new(IO.read(config_file)).result)
-  end
-  ActsAsCached.config = {}
-end
